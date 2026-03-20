@@ -1,0 +1,31 @@
+{
+  "pins" : [
+    {
+      "identity" : "idnarules-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dns-inspector/IDNARules-Swift.git",
+      "state" : {
+        "revision" : "7f47c398379e46f324bb82f803829026c48763d0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "c5d11a805e765f52ba34ec7284bd4fcd6ba68615",
+        "version" : "1.7.0"
+      }
+    },
+    {
+      "identity" : "swift-async-dns-resolver",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-async-dns-resolver",
+      "state" : {
+        "revision" : "2836c57c4c7c784569331cc35a4fe18941f6c796",
+        "version" : "0.5.0"
+      }
+    }
+  ],
+  "version" : 2
+}

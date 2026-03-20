@@ -1,0 +1,3 @@
+[submodule "dnskit"]
+	path = dnskit
+	url = https://github.com/blackhuman/dnskit.git
