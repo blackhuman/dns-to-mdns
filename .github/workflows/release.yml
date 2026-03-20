@@ -24,4 +24,4 @@ jobs:
           base-branch: main
           download-url: https://github.com/blackhuman/dns-to-mdns/releases/download/${{ github.event.release.tag_name }}/dns-to-mdns-${{ steps.version.outputs.clean_version }}-darwin-universal.tar.gz
         env:
-          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}

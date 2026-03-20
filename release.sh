@@ -1,7 +1,8 @@
 #!/bin/bash
 # Release automation script for dns-to-mdns
 
-set -e
+set -e # Exit on error
+set -x # Print each command before executing it
 
 # 1. Check if version is provided
 if [ -z "$1" ]; then
@@ -20,10 +21,10 @@ if ! command -v gh &> /dev/null; then
 fi
 
 # 3. Check if there are uncommitted changes
-if ! git diff-index --quiet HEAD --; then
-    echo "Error: You have uncommitted changes. Please commit or stash them first."
-    exit 1
-fi
+# if ! git diff-index --quiet HEAD --; then
+#     echo "Error: You have uncommitted changes. Please commit or stash them first."
+#     exit 1
+# fi
 
 # 4. Push current state to GitHub
 CURRENT_BRANCH=$(git branch --show-current)
