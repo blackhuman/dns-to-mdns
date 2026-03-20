@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  homebrew:
+    name: Bump Homebrew formula
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get clean version
+        id: version
+        run: echo "clean_version=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')" >> $GITHUB_OUTPUT
+
+      - name: Bump Homebrew formula
+        uses: mislav/bump-homebrew-formula-action@v3
+        with:
+          formula-name: dns-to-mdns
+          homebrew-tap: blackhuman/homebrew-tap
+          base-branch: main
+          download-url: https://github.com/blackhuman/dns-to-mdns/releases/download/${{ github.event.release.tag_name }}/dns-to-mdns-${{ steps.version.outputs.clean_version }}-darwin-universal.tar.gz
+        env:
+          COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
