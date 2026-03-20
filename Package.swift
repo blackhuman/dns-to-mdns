@@ -15,7 +15,7 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "dnskit"),
-        .package(url: "https://github.com/apple/swift-async-dns-resolver", from: "0.1.0"),
+        .package(path: "swift-async-dns-resolver"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.2.0")
     ],
     targets: [

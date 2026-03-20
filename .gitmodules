@@ -1,3 +1,6 @@
 [submodule "dnskit"]
 	path = dnskit
 	url = https://github.com/blackhuman/dnskit.git
+[submodule "swift-async-dns-resolver"]
+	path = swift-async-dns-resolver
+	url = https://github.com/blackhuman/swift-async-dns-resolver.git
