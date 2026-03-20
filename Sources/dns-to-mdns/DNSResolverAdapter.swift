@@ -4,7 +4,7 @@ import AsyncDNSResolver
 
 /// Adapter wrapper around AsyncDNSResolver for mDNS resolution
 /// Provides a simplified API for resolving hostnames to IPv4 addresses with optional IP range filtering
-class DNSResolverAdapter {
+actor DNSResolverAdapter {
     private let resolver: AsyncDNSResolver
     private let fullResolver = DNSResolver()
     private let excludedCIDRRanges: [IPv4Network]

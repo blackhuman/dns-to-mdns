@@ -70,11 +70,7 @@ struct DNSProxyCommand: AsyncParsableCommand {
 
 // Entry point
 Task {
-    do {
-        try await DNSProxyCommand.main()
-    } catch {
-        exit(1)
-    }
+    await DNSProxyCommand.main()
 }
 
 // Run the event loop

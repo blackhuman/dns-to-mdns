@@ -3,7 +3,7 @@ import dnssd
 import Network
 
 /// Wrapper for DNSServiceGetAddrInfo from the dnssd framework
-class DNSResolver {
+actor DNSResolver {
     
     private final class ResolveContext: @unchecked Sendable {
         private let lock = NSLock()
@@ -105,7 +105,7 @@ class DNSResolver {
                         let sin = address.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee }
                         var addr = sin.sin_addr
                         inet_ntop(AF_INET, &addr, &ipAddress, socklen_t(INET_ADDRSTRLEN))
-                        let ipString = String(cString: ipAddress)
+                        let ipString = ipAddress.withUnsafeBufferPointer { String(cString: $0.baseAddress!) }
                         context.addAddress(ipString)
                     }
                 }

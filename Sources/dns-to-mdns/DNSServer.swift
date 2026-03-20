@@ -4,7 +4,7 @@ import DNSKit
 import os
 
 /// DNS Server - Listens for DNS queries on UDP and responds using mDNS resolution
-class DNSServer {
+actor DNSServer {
     private var listener: NWListener?
     private let resolver: DNSResolverAdapter
     private let port: UInt16
@@ -42,11 +42,11 @@ class DNSServer {
         self.listener = listener
         
         listener.stateUpdateHandler = { [weak self] state in
-            self?.handleStateChange(state)
+            Task { await self?.handleStateChange(state) }
         }
         
         listener.newConnectionHandler = { [weak self] connection in
-            self?.setupConnection(connection)
+            Task { await self?.setupConnection(connection) }
         }
         
         listener.start(queue: .global())
@@ -73,11 +73,13 @@ class DNSServer {
     }
     
     private func setupConnection(_ connection: NWConnection) {
-        connection.stateUpdateHandler = { [weak self] state in
-            if case .ready = state {
-//                self?.receiveRequest(on: connection)
-            } else if case .failed = state {
-                connection.cancel()
+        connection.stateUpdateHandler = { state in
+            Task {
+                if case .ready = state {
+                    // await self?.receiveRequest(on: connection)
+                } else if case .failed = state {
+                    connection.cancel()
+                }
             }
         }
         connection.start(queue: queue)
@@ -86,22 +88,22 @@ class DNSServer {
     
     private func receiveRequest(on connection: NWConnection) {
         connection.receiveMessage { [weak self] content, _, isComplete, error in
-            if let error = error {
-                self?.logger.error("Receive error: \(error.localizedDescription)")
-                connection.cancel()
-                return
-            }
-            
-            guard let data = content, !data.isEmpty else {
-                print("New message error.")
-                return
-            }
-            
-            if let message = String(data: data, encoding: .utf8) {
-                print("New message: \(message)")
-            }
-            
             Task {
+                if let error = error {
+                    await self?.logError("Receive error: \(error.localizedDescription)")
+                    connection.cancel()
+                    return
+                }
+                
+                guard let data = content, !data.isEmpty else {
+                    print("New message error.")
+                    return
+                }
+                
+                if let message = String(data: data, encoding: .utf8) {
+                    print("New message: \(message)")
+                }
+                
                 await self?.processDNSRequest(data: data, connection: connection)
             }
         }
@@ -169,13 +171,23 @@ class DNSServer {
     
     private func sendResponse(_ data: Data, on connection: NWConnection) {
         connection.send(content: data, completion: .contentProcessed { [weak self] error in
-            if let error = error {
-                self?.logger.error("Send error: \(error.localizedDescription)")
-            } else {
-                self?.logger.debug("Sent response: \(data.count) bytes")
+            Task {
+                if let error = error {
+                    await self?.logError("Send error: \(error.localizedDescription)")
+                } else {
+                    await self?.logDebug("Sent response: \(data.count) bytes")
+                }
+                connection.cancel()
             }
-            connection.cancel()
         })
+    }
+    
+    private func logError(_ message: String) {
+        logger.error("\(message)")
+    }
+    
+    private func logDebug(_ message: String) {
+        logger.debug("\(message)")
     }
 }
 
