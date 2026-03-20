@@ -25,8 +25,12 @@ if ! git diff-index --quiet HEAD --; then
     exit 1
 fi
 
-# 4. Create and push the release
-# 4. Build and package the binary (Universal for macOS)
+# 4. Push current state to GitHub
+CURRENT_BRANCH=$(git branch --show-current)
+echo "🆙 Pushing current branch '$CURRENT_BRANCH' to origin..."
+git push origin "$CURRENT_BRANCH"
+
+# 5. Build and package the binary (Universal for macOS)
 echo "🏗️  Building universal release binary (arm64 + x86_64)..."
 swift build -c release --disable-sandbox --arch arm64 --arch x86_64
 
@@ -40,7 +44,7 @@ ASSET_NAME="dns-to-mdns-${CLEAN_VERSION}-${OS}-${ARCH}.tar.gz"
 # Archive the binary
 tar -czf "$ASSET_NAME" -C .build/apple/Products/Release dns-to-mdns
 
-# 5. Create the release with the asset
+# 6. Create the release with the asset
 echo "🚀 Creating release $VERSION with asset: $ASSET_NAME..."
 
 # This command will:
