@@ -4,3 +4,6 @@
 [submodule "swift-async-dns-resolver"]
 	path = swift-async-dns-resolver
 	url = https://github.com/blackhuman/swift-async-dns-resolver.git
+[submodule "homebrew/homebrew-tap"]
+	path = homebrew/homebrew-tap
+	url = https://github.com/blackhuman/homebrew-tap.git
