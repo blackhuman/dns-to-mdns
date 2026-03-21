@@ -27,36 +27,5 @@ jobs:
         env:
           COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
 
-  homebrew-releaser:
-    name: Release to Homebrew Tap (via homebrew-releaser)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get clean version
-        id: version
-        run: echo "clean_version=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')" >> $GITHUB_OUTPUT
 
-      - name: Release project to Homebrew tap
-        uses: Justintime50/homebrew-releaser@v3
-        with:
-          homebrew_owner: blackhuman
-          homebrew_tap: homebrew-tap
-          github_token: ${{ secrets.COMMITTER_TOKEN }}
-          
-          # Custom tarball configuration for the universal binary
-          custom_tarball: "dns-to-mdns-${{ steps.version.outputs.clean_version }}-darwin-universal"
-          
-          # Formula configuration
-          install: 'bin.install "dns-to-mdns"'
-          depends_on: 'macos: :monterey'
-          test: 'system "#{bin}/dns-to-mdns", "--help"'
-          
-          # Inject the service block using formula_includes
-          formula_includes: |
-            service do
-              run [opt_bin/"dns-to-mdns", "-p", "8053"]
-              keep_alive true
-              working_dir HOMEBREW_PREFIX
-              log_path var/"log/dns-to-mdns.log"
-              error_log_path var/"log/dns-to-mdns-error.log"
-            end
 
