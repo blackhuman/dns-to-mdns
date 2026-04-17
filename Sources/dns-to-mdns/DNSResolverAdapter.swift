@@ -6,7 +6,6 @@ import AsyncDNSResolver
 /// Provides a simplified API for resolving hostnames to IPv4 addresses with optional IP range filtering
 actor DNSResolverAdapter {
     private let resolver: AsyncDNSResolver
-    private let fullResolver = DNSResolver()
     private let excludedCIDRRanges: [IPv4Network]
     
     /// Initialize the resolver adapter
@@ -25,28 +24,8 @@ actor DNSResolverAdapter {
     /// - Parameter hostname: The hostname to resolve (e.g., "mydevice.local")
     /// - Returns: IPv4 address as 4-byte Data, or nil if resolution fails or all results are filtered
     func resolveIPv4(hostname: String) async -> Data? {
-        // Try full host resolve first using DNSServiceGetAddrInfo
-        // do {
-        //     print("Trying DNSServiceGetAddrInfo (mDNS) for \(hostname)...")
-        //     let ipStrings = try await fullResolver.resolve(host: hostname)
-        //     print("  Successfully resolved \(ipStrings.count) IP(s) via DNSServiceGetAddrInfo: \(ipStrings.joined(separator: ", "))")
-            
-        //     for ipString in ipStrings {
-        //         if let ipv4Address = IPv4Address(ipString) {
-        //             if isIPExcluded(ipv4Address) {
-        //                 print("  ⚠️  Excluded: \(ipv4Address)")
-        //             } else {
-        //                 print("  ✅ Using (mDNS): \(ipv4Address)")
-        //                 return ipv4Address.data
-        //             }
-        //         }
-        //     }
-        // } catch {
-        //     print("  DNSServiceGetAddrInfo failed for \(hostname): \(error)")
-        // }
-
         do {
-            // fallback to Query for A records
+            // Query A records directly through the configured internal mDNS resolver.
             print("Falling back to AsyncDNSResolver for \(hostname)...")
             let records = try await resolver.queryA(name: hostname)
             

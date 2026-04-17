@@ -3,6 +3,7 @@ import dnssd
 import Network
 
 /// Wrapper for DNSServiceGetAddrInfo from the dnssd framework
+@available(*, deprecated, message: "Use DNSResolverAdapter for mDNS lookups so CLI test mode and server mode share the same resolution path.")
 actor DNSResolver {
     
     private final class ResolveContext: @unchecked Sendable {

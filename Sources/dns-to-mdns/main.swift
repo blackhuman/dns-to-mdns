@@ -22,10 +22,21 @@ struct DNSProxyCommand: AsyncParsableCommand {
         help: "UDP port to listen on"
     )
     var port: UInt16 = 8053
+
+    @Option(
+        name: .long,
+        help: "Resolve a single hostname through the internal mDNS client and exit"
+    )
+    var test: String?
     
     func run() async throws {
         // Parse excluded CIDR ranges
         let cidrRanges = exclude.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+
+        if let testHost = test?.trimmingCharacters(in: .whitespacesAndNewlines), !testHost.isEmpty {
+            try await runTest(for: testHost)
+            return
+        }
         
         print("DNS-to-mDNS Proxy")
         print("=================")
@@ -53,6 +64,26 @@ struct DNSProxyCommand: AsyncParsableCommand {
             fatalError("Server error: \(error)")
         }
     }
+
+    private func runTest(for host: String) async throws {
+        let cidrRanges = exclude.split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
+        let resolver = try DNSResolverAdapter(excludedCIDRRanges: cidrRanges)
+
+        print("DNS-to-mDNS Test")
+        print("================")
+        print("Resolving \(host) via internal mDNS client")
+        print("Excluded IP ranges: \(cidrRanges.joined(separator: ", "))")
+        print("")
+
+        if let ipv4Data = await resolver.resolveIPv4(hostname: host) {
+            let address = ipv4Data.map { String($0) }.joined(separator: ".")
+            print("A record for \(host):")
+            print("  \(address)")
+        } else {
+            print("No usable A record found for \(host)")
+            throw ExitCode.failure
+        }
+    }
     
     private func waitForTermination() async {
         await withCheckedContinuation { continuation in
@@ -68,10 +99,9 @@ struct DNSProxyCommand: AsyncParsableCommand {
     }
 }
 
-// Entry point
 Task {
     await DNSProxyCommand.main()
+    exit(EXIT_SUCCESS)
 }
 
-// Run the event loop
-RunLoop.main.run()
+dispatchMain()
